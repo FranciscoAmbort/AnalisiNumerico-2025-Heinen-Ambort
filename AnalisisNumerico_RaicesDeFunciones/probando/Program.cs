@@ -17,11 +17,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
 
             //Este formato para que corran las iteraciones
             Console.Write("Ingresa tolerancia: ");
-            double tol = double.Parse(
-                Console.ReadLine()!,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture
-            );
+            double tol = double.Parse(Console.ReadLine());
 
             // 2) Ejecutar Bisección
             Console.WriteLine("\n--- Bisección ---");

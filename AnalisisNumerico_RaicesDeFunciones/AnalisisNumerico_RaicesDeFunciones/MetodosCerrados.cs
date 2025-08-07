@@ -75,7 +75,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                     }
                     else
                     {
-                        if (calculo.EvaluaFx(xi)*fxr < 0)
+                        if (calculo.EvaluaFx(xi)*fxr > 0)
                         {
                             xi = xr;
                         }
@@ -168,7 +168,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                     }
                     else
                     {
-                        if (calculo.EvaluaFx(xi) * fxr < 0)
+                        if (calculo.EvaluaFx(xi) * fxr > 0)
                         {
                             xi = xr;
                         }
