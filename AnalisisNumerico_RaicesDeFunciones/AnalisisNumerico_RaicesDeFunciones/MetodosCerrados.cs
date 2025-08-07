@@ -148,6 +148,10 @@ namespace AnalisisNumerico_RaicesDeFunciones
 
                 for (int i = 1; i <= maxiteraciones; i++)
                 {
+                    fxi = calculo.EvaluaFx(xi);
+                    fxd = calculo.EvaluaFx(xd);
+
+                    xrAnterior = xr;
                     xr = (xi * fxd - xd * fxi) / (fxd - fxi);
 
                     error = Math.Abs((xr - xrAnterior) / xr);

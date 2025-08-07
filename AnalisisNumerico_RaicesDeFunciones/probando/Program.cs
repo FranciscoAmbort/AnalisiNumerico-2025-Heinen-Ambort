@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace AnalisisNumerico_RaicesDeFunciones
 {
@@ -14,8 +15,13 @@ namespace AnalisisNumerico_RaicesDeFunciones
             Console.Write("Ingresa número máximo de iteraciones: ");
             int maxIter = int.Parse(Console.ReadLine());
 
+            //Este formato para que corran las iteraciones
             Console.Write("Ingresa tolerancia: ");
-            double tol = double.Parse(Console.ReadLine());
+            double tol = double.Parse(
+                Console.ReadLine()!,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture
+            );
 
             // 2) Ejecutar Bisección
             Console.WriteLine("\n--- Bisección ---");
