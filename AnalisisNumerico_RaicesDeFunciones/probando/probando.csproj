@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="Calculus">
+      <HintPath>..\..\..\..\..\Downloads\Calculus.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
