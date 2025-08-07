@@ -60,12 +60,12 @@ namespace AnalisisNumerico_RaicesDeFunciones
                 double xr = 0;
                 double error = 0;
 
-                for (int i = 1; i < maxiteraciones; i++)
+                for (int i = 1; i <= maxiteraciones; i++)
                 {
                     xr = 0.5 * (xi + xd);
                     error = Math.Abs((xr - xrAnterior)/ xr);
                     double fxr = calculo.EvaluaFx(xr);
-                    if (Math.Abs(fxr) < tolerancia || error < tolerancia)
+                    if (Math.Abs(fxr) < tolerancia || (i > 1 && error < tolerancia)) // ver
                     {
                         result.Xr = xr;
                         result.Iteraciones = i;
@@ -146,7 +146,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                 double xr = 0;
                 double error = 0;
 
-                for (int i = 1; i < maxiteraciones; i++)
+                for (int i = 1; i <= maxiteraciones; i++)
                 {
                     xr = (xi * fxd - xd * fxi) / (fxd - fxi);
 
@@ -154,7 +154,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
 
                     double fxr = calculo.EvaluaFx(xr);
 
-                    if (Math.Abs(fxr) < tolerancia || error < tolerancia)
+                    if (Math.Abs(fxr) < tolerancia || (i > 1 && error < tolerancia)) // ver for
                     {
                         result.Xr = xr;
                         result.Iteraciones = i;

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AnalisisNumerico_RaicesDeFunciones\AnalisisNumerico_RaicesDeFunciones.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Calculus">
       <HintPath>..\..\..\..\..\Downloads\Calculus.dll</HintPath>
     </Reference>
