@@ -26,5 +26,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("DevCors");
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.MapControllers();
 app.Run();
+
