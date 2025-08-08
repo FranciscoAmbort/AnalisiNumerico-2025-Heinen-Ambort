@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalisisNumerico_RaicesDeFunciones", "AnalisisNumerico_RaicesDeFunciones\AnalisisNumerico_RaicesDeFunciones.csproj", "{41EC99B1-0DBA-40DE-8B3B-5A59F7BFC9A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalisisNumerico_RaicesDeFunciones", "AnalisisNumerico_RaicesDeFunciones\AnalisisNumerico_RaicesDeFunciones.csproj", "{41EC99B1-0DBA-40DE-8B3B-5A59F7BFC9A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "probando", "probando\probando.csproj", "{62CB1610-1085-4C26-B4B3-777088F14F24}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppi", "WebAppi\WebAppi.csproj", "{05234E10-880D-40BD-8C1A-C4AEDD747156}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{41EC99B1-0DBA-40DE-8B3B-5A59F7BFC9A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41EC99B1-0DBA-40DE-8B3B-5A59F7BFC9A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41EC99B1-0DBA-40DE-8B3B-5A59F7BFC9A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{62CB1610-1085-4C26-B4B3-777088F14F24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{62CB1610-1085-4C26-B4B3-777088F14F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{62CB1610-1085-4C26-B4B3-777088F14F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{62CB1610-1085-4C26-B4B3-777088F14F24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
