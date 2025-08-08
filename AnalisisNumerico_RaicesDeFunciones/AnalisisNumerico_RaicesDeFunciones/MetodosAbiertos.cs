@@ -10,9 +10,9 @@ namespace AnalisisNumerico_RaicesDeFunciones
 {
     public class MetodosAbiertos
     {
-        public MetodoCerradoResultado NewtonRaphson(MetodoNewtonRapshonRequest request)
+        public ResultadoDTO NewtonRaphson(MetodoNewtonRapshonRequest request)
         {
-            var res = new MetodoCerradoResultado
+            var res = new ResultadoDTO
             {
                 Funcion = request.Funcion,
                 Metodo = "Newton-Raphson"

@@ -16,7 +16,7 @@ namespace WebAppi.Controllers
         }
 
         [HttpPost("biseccion")]
-        public ActionResult<MetodoCerradoResultado> Biseccion([FromBody] MetodoCerradoRequest request)
+        public ActionResult<ResultadoDTO> Biseccion([FromBody] MetodoCerradoRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -38,7 +38,7 @@ namespace WebAppi.Controllers
         }
 
         [HttpPost("regla-falsa")]
-        public ActionResult<MetodoCerradoResultado> ReglaFalsa([FromBody] MetodoCerradoRequest request)
+        public ActionResult<ResultadoDTO> ReglaFalsa([FromBody] MetodoCerradoRequest request)
         {
             if (!ModelState.IsValid)
             {

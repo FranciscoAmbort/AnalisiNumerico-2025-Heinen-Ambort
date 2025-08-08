@@ -2,7 +2,7 @@
 using System.Xml;
 namespace AnalisisNumerico_RaicesDeFunciones
 {
-    public class MetodoCerradoResultado
+    public class ResultadoDTO
     {
         public double Xr {  get; set; }
         public int Iteraciones { get; set; }

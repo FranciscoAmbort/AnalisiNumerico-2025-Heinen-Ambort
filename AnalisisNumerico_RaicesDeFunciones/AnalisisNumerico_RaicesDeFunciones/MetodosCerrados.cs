@@ -9,9 +9,9 @@ namespace AnalisisNumerico_RaicesDeFunciones
 {
     public class MetodosCerrados
     {
-        public MetodoCerradoResultado Biseccion (MetodoCerradoRequest request)
+        public ResultadoDTO Biseccion (MetodoCerradoRequest request)
         {
-            var result = new MetodoCerradoResultado { Metodo = "Regla falsa"};
+            var result = new ResultadoDTO { Metodo = "Regla falsa"};
             Calculo calculo = new Calculo();
 
             if (!calculo.Sintaxis(request.Funcion, 'x'))
@@ -87,9 +87,9 @@ namespace AnalisisNumerico_RaicesDeFunciones
                 return result;
             }
         }
-        public MetodoCerradoResultado ReglaFalsa(MetodoCerradoRequest request)
+        public ResultadoDTO ReglaFalsa(MetodoCerradoRequest request)
         {
-            var result = new MetodoCerradoResultado { Metodo = "Biseccion" };
+            var result = new ResultadoDTO { Metodo = "Biseccion" };
             Calculo calculo = new Calculo();
 
             if (!calculo.Sintaxis(request.Funcion, 'x'))
