@@ -9,63 +9,54 @@ namespace AnalisisNumerico_RaicesDeFunciones
 {
     public static class MetodosCerrados
     {
-        public static MetodoCerradoResultado Biseccion (string fx, int maxiteraciones, double tolerancia)
+        public static MetodoCerradoResultado Biseccion (MetodoCerradoRequest request)
         {
             var result = new MetodoCerradoResultado { Metodo = "Biseccion"};
             Calculo calculo = new Calculo();
 
-            while (!calculo.Sintaxis(fx, 'x'))
+            if (!calculo.Sintaxis(request.Funcion, 'x'))
             {
-                Console.WriteLine("Error en la sintaxis de la función. Ingresá de nuevo:");
-                fx = Console.ReadLine();
+                throw new Exception("Error en la sintaxis de la funcion");
             }
 
-            result.Funcion = fx;
+            result.Funcion = request.Funcion;
 
-            double xi, xd, fxi, fxd; 
-
-            while (true)
-            {
-                Console.Write("Ingresá xi: ");
-                xi = double.Parse(Console.ReadLine());
-
-                Console.Write("Ingresá xd: ");
-                xd = double.Parse(Console.ReadLine());
-
-                fxi = calculo.EvaluaFx(xi);
-                fxd = calculo.EvaluaFx(xd);
+            double fxi = calculo.EvaluaFx(request.Xi);
+            double fxd = calculo.EvaluaFx(request.Xd);
 
                 if (fxi * fxd < 0)
-                    break;
-
-                Console.WriteLine("No hay cambio de signo. Probá con otro intervalo.\n");
+            {
+                throw new Exception("No hay cambio de signo en el intervalo dado.");
             }
 
             if (fxi * fxd == 0)
             {
                 result.Iteraciones = 1;
-                result.Error = 0; // Preguntar profe
+                result.Error = 1;
                 result.Converge = true;
                 if (fxi == 0)
                 {
-                    result.Xr = xi;   
+                    result.Xr = request.Xi;   
                 }else
                 {
-                    result.Xr = xd;
+                    result.Xr = request.Xd;
                 }
                 return result;
             }else 
             {
-                double xrAnterior = xi; //pregutar a profe
+                double xi = request.Xi;
+                double xd = request.Xd;
+                double xrAnterior = 0; //pregutar a profe
                 double xr = 0;
                 double error = 0;
 
-                for (int i = 1; i <= maxiteraciones; i++)
+                for (int i = 1; i <= request.MaxIteraciones; i++)
                 {
                     xr = 0.5 * (xi + xd);
                     error = Math.Abs((xr - xrAnterior)/ xr);
                     double fxr = calculo.EvaluaFx(xr);
-                    if (Math.Abs(fxr) < tolerancia || (i > 1 && error < tolerancia)) // ver
+
+                    if (Math.Abs(fxr) < request.Tolerancia || (i > 1 && error < request.Tolerancia)) // ver
                     {
                         result.Xr = xr;
                         result.Iteraciones = i;
@@ -87,7 +78,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                     }
                 }
                 result.Xr = xr;
-                result.Iteraciones = maxiteraciones;
+                result.Iteraciones = request.MaxIteraciones;
                 result.Error = error;
                 result.Converge = false;
                 return result;
@@ -128,7 +119,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
             if (fxi * fxd == 0)
             {
                 result.Iteraciones = 1;
-                result.Error = 0; // Preguntar profe
+                result.Error = 1; // Preguntar profe
                 result.Converge = true;
                 if (fxi == 0)
                 {
@@ -142,7 +133,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
             }
             else
             {
-                double xrAnterior = xi; //pregutar a profe
+                double xrAnterior = 0; //pregutar a profe
                 double xr = 0;
                 double error = 0;
 
