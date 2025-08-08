@@ -14,4 +14,10 @@
     <ProjectReference Include="..\AnalisisNumerico_RaicesDeFunciones\AnalisisNumerico_RaicesDeFunciones.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\estilos.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
