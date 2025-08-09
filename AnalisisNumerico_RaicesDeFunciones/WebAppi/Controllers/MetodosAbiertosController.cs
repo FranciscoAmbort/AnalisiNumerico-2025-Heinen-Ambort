@@ -14,7 +14,7 @@ namespace WebAppi.Controllers
         }
 
         [HttpPost("newtonRaphson")]
-        public ActionResult<ResultadoDTO> Biseccion([FromBody] MetodoNewtonRapshonRequest request)
+        public ActionResult<ResultadoDTO> NewtonPaphson([FromBody] MetodoNewtonRapshonRequest request)
         {
             if (!ModelState.IsValid)
             {
