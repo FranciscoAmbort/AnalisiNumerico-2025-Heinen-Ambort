@@ -89,7 +89,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
         }
         public ResultadoDTO ReglaFalsa(MetodoCerradoRequest request)
         {
-            var result = new ResultadoDTO { Metodo = "Biseccion" };
+            var result = new ResultadoDTO { Metodo = "Regla falsa" };
             Calculo calculo = new Calculo();
 
             if (!calculo.Sintaxis(request.Funcion, 'x'))
