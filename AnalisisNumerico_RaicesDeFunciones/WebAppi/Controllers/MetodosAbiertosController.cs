@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAppi.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class MetodosAbiertosController : Controller
     {
         private readonly MetodosAbiertos _service;
@@ -13,7 +15,7 @@ namespace WebAppi.Controllers
             _service = service;
         }
 
-        [HttpPost("newtonRaphson")]
+        [HttpPost("newton-raphson")]
         public ActionResult<ResultadoDTO> NewtonRaphson([FromBody] MetodoNewtonRapshonRequest request)
         {
             if (!ModelState.IsValid)
