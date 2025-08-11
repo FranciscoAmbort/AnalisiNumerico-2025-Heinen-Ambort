@@ -6,6 +6,7 @@ builder.Services.AddControllers();
 
 // Registramos directamente la clase concreta
 builder.Services.AddScoped<MetodosCerrados>();
+builder.Services.AddScoped<MetodosAbiertos>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

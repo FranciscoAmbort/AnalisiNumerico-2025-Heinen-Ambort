@@ -54,11 +54,11 @@ namespace AnalisisNumerico_RaicesDeFunciones
 
                 double Xnew = xr - fxi / dfx;
 
-                error = Math.Abs((Xnew - xr) / Xnew);
+                error = Math.Abs((xr - xrAnterior) / xr);
 
                 double fnew = calculo.EvaluaFx(Xnew);
 
-                if (Math.Abs(fnew) < request.Tolerancia || i < request.MaxIteraciones || error < request.Tolerancia)
+                if (Math.Abs(fnew) < request.Tolerancia && i < request.MaxIteraciones || error < request.Tolerancia)
                 {
                     res.Xr = xr;
                     res.Iteraciones = i;
