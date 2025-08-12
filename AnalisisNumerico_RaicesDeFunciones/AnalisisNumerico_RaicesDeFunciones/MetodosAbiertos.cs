@@ -27,7 +27,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
             double xr = request.Xi;
             double fxi = calculo.EvaluaFx(xr);
 
-            if (fxi == 0)
+            if (Math.Abs(fxi) < request.Tolerancia)
             {
                 res.Xr = xr;
                 res.Iteraciones = 1;
@@ -39,9 +39,10 @@ namespace AnalisisNumerico_RaicesDeFunciones
             double error = 1;
             double xrAnterior = xr;
 
-            for (int i = 0; i <= request.MaxIteraciones; i++)
+            for (int i = 1; i <= request.MaxIteraciones; i++)
             {
-                double dfx = calculo.Dx(xr);
+
+                double dfx = (calculo.EvaluaFx((request.Xi + request.Tolerancia)) - calculo.EvaluaFx(xr)) / request.Tolerancia;
 
                 if (Math.Abs(dfx) < request.Tolerancia)
                 {
@@ -52,13 +53,12 @@ namespace AnalisisNumerico_RaicesDeFunciones
                     return res;
                 }
 
-                double Xnew = xr - fxi / dfx;
+                xr = request.Xi - (calculo.EvaluaFx(request.Xi) / dfx);
 
                 error = Math.Abs((xr - xrAnterior) / xr);
 
-                double fnew = calculo.EvaluaFx(Xnew);
 
-                if (Math.Abs(fnew) < request.Tolerancia && i < request.MaxIteraciones || error < request.Tolerancia)
+                if (Math.Abs(xr) < request.Tolerancia || i > request.MaxIteraciones || error < request.Tolerancia)
                 {
                     res.Xr = xr;
                     res.Iteraciones = i;
@@ -68,8 +68,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                 }
 
                 xrAnterior = xr;
-                xr = Xnew;
-                fxi = fnew;
+                request.Xi = xr;
             }
 
             res.Xr = xr;
