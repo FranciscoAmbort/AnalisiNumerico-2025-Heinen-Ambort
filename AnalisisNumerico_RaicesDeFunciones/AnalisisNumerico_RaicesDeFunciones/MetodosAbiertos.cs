@@ -58,7 +58,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                 error = Math.Abs((xr - xrAnterior) / xr);
 
 
-                if (Math.Abs(xr) < request.Tolerancia || i > request.MaxIteraciones || error < request.Tolerancia)
+                if (Math.Abs(calculo.EvaluaFx(xr)) < request.Tolerancia || i > request.MaxIteraciones || error < request.Tolerancia)
                 {
                     res.Xr = xr;
                     res.Iteraciones = i;
