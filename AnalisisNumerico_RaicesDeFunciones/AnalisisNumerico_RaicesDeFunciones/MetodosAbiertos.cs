@@ -42,7 +42,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
             for (int i = 1; i <= request.MaxIteraciones; i++)
             {
 
-                double dfx = (calculo.EvaluaFx((request.Xi + request.Tolerancia)) - calculo.EvaluaFx(xr)) / request.Tolerancia;
+                double dfx = calculo.Dx(xr);
 
                 if (Math.Abs(dfx) < request.Tolerancia)
                 {
@@ -53,12 +53,15 @@ namespace AnalisisNumerico_RaicesDeFunciones
                     return res;
                 }
 
-                xr = request.Xi - (calculo.EvaluaFx(request.Xi) / dfx);
+                //xrAnterior = xr;
+
+                //xr = xr - fxi / dfx;
 
                 error = Math.Abs((xr - xrAnterior) / xr);
 
+                fxi = calculo.EvaluaFx(xr);
 
-                if (Math.Abs(calculo.EvaluaFx(xr)) < request.Tolerancia || i > request.MaxIteraciones || error < request.Tolerancia)
+                if (Math.Abs(fxi) < request.Tolerancia || i > request.MaxIteraciones || error < request.Tolerancia)
                 {
                     res.Xr = xr;
                     res.Iteraciones = i;
