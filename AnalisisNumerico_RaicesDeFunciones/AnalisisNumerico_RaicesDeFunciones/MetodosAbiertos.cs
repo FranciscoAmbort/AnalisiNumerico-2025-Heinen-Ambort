@@ -118,7 +118,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
             double xrAnterior = 0;
             double error = 1;
 
-            for (int i = 0; i < request.MaxIteraciones; i++) {
+            for (int i = 1; i <= request.MaxIteraciones; i++) {
                 double denominador = fxd - fxi;
 
                 if (Math.Abs((double)denominador) < request.Tolerancia)
