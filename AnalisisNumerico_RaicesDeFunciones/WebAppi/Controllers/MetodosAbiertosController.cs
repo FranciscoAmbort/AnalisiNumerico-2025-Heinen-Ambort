@@ -36,6 +36,26 @@ namespace WebAppi.Controllers
                 return StatusCode(500, new { error = "Error interno del servidor" });
             }
         }
-
+        [HttpPost("secante")]
+        public ActionResult<ResultadoDTO> Secante([FromBody] MetodoCerradoRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var resultado = _service.Secante(request);
+                return Ok(resultado);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor" });
+            }
+        }
     }
 }
