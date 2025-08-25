@@ -4,18 +4,22 @@ let ggbApp = null;
 window.addEventListener("load", function () {
     ggbApp = new GGBApplet({
         appName: "graphing",
-        width: 600,
-        height: 400,
+        width: 900,   // más grande
+        height: 560,
         showToolBar: false,
         showAlgebraInput: false,
         showMenuBar: false,
         appletOnLoad: function (api) {
+            try { api.setPerspective && api.setPerspective("G"); } catch (e) { }
+            try { api.setGridVisible(true); api.setAxesVisible(true, true); } catch (e) { }
             console.log("GeoGebra listo");
         }
-    }, true); // 👈 importante que sea true para cargarlo inmediatamente
+    }, true);
 
-    ggbApp.inject('ggb-element'); // este div está en tu HTML
+    ggbApp.inject('ggb-element');
 });
+
+
 
 // -------------------- Formulario Bisección --------------------
 document.getElementById("form-biseccion").addEventListener("submit", async function (e) {
@@ -41,50 +45,186 @@ document.getElementById("form-biseccion").addEventListener("submit", async funct
         const data = await response.json();
 
         if (!response.ok) {
-            document.getElementById("resultado").textContent = `Error: ${data.error || "Error desconocido"}`;
+            renderResultado({ xr: '-', iteraciones: '-', error: data.error || 'Error', converge: false }, requestData);
         } else {
-            document.getElementById("resultado").textContent = JSON.stringify(data, null, 2);
-
-            // 👉 Graficar en GeoGebra con los datos de la API
-            graficarEnGeoGebra(requestData.Funcion, data.Xr);
+            renderResultado(data, requestData);
+            updatePretty(); // ⬅️ refresca f(x) en LaTeX
+            graficarEnGeoGebra(requestData.Funcion, (data.Xr ?? data.xr), requestData.Xi, requestData.Xd);
         }
+
+
+
+        // GeoGebra: Abs/Log/Ln/Exp/Sen -> sintaxis compatible
+        function convertirFuncionParaGeoGebra(fx) {
+            return String(fx)
+                .replace(/Abs/gi, "abs")
+                .replace(/Log10/gi, "log10")
+                .replace(/Log/gi, "log")
+                .replace(/Ln/gi, "ln")
+                .replace(/Exp/gi, "exp")
+                .replace(/Sen/gi, "sin");
+        }
+
+        // LaTeX para mostrar en pantalla (3x en vez de 3*x, | | para abs)
+        function toLatexFromInput(fx) {
+            let s = String(fx).trim();
+
+            // valor absoluto: Abs(expr) -> |expr|
+            s = s.replace(/Abs\s*\(([^()]+)\)/gi, '\\left|$1\\right|');
+
+            // funciones conocidas a LaTeX
+            s = s.replace(/\bLn\(/gi, '\\ln(')
+                .replace(/\bLog\(/gi, '\\log(')
+                .replace(/\bExp\(/gi, '\\exp(')
+                .replace(/\bSqrt\(/gi, '\\sqrt{');
+
+            // 3*x -> 3x  (número seguido de * y x)
+            s = s.replace(/(\d)\s*\*\s*x/gi, '$1x');
+            // a*(b) -> a·(b) (multiplicación general como ·)
+            s = s.replace(/\*/g, '\\cdot ');
+
+            // Potencias: ya funciona con ^, pero si hay algo como (x+1)^2 también es válido
+            return s;
+        }
+
+        // Renderiza el LaTeX en el banner f(x)= ...
+        function updatePretty() {
+            const raw = document.getElementById('funcion').value || '';
+            const latex = toLatexFromInput(raw);
+            const el = document.getElementById('fx-pretty');
+            el.textContent = `\\( ${latex} \\)`;
+            if (window.MathJax) { MathJax.typesetPromise([el]); }
+        }
+
+
+        // refrescar f(x) mientras escriben y al cargar
+        document.getElementById('funcion').addEventListener('input', updatePretty);
+        window.addEventListener('load', updatePretty);
+
+
 
     } catch (error) {
         document.getElementById("resultado").textContent = `Error de conexión: ${error}`;
     }
 });
 
+// -------------------- Conversión de funciones a sintaxis GeoGebra --------------------
+function convertirFuncionParaGeoGebra(fx) {
+    return String(fx)
+        .replace(/Abs/gi, "abs")
+        .replace(/Log10/gi, "log10")
+        .replace(/Log/gi, "log")   // log natural
+        .replace(/Ln/gi, "ln")
+        .replace(/Exp/gi, "exp")
+        .replace(/Sen/gi, "sin");  // si alguien escribe "Sen"
+}
+
+
 // -------------------- Función para graficar --------------------
-function graficarEnGeoGebra(fx, raiz) {
+function graficarEnGeoGebra(fx, raiz, xi, xd) {
     if (!ggbApp || !ggbApp.getAppletObject) {
         console.error("GeoGebra aún no está listo");
         return;
     }
-
     const ggb = ggbApp.getAppletObject();
-
-    // Limpiar todo antes
     ggb.reset();
 
     try {
-        // Dibujar función
-        ggb.evalCommand(`f(x) = ${fx}`);
+        const f = convertirFuncionParaGeoGebra(fx);
+        ggb.evalCommand(`f(x) = ${f}`);
 
-        // Marcar Xi y Xd
-        ggb.evalCommand(`Xi = (${document.getElementById("xi").value}, f(${document.getElementById("xi").value}))`);
-        ggb.evalCommand(`Xd = (${document.getElementById("xd").value}, f(${document.getElementById("xd").value}))`);
-        ggb.setPointSize("Xi", 4);
-        ggb.setPointSize("Xd", 4);
-        ggb.setColor("Xi", 0, 0, 255); // azul
-        ggb.setColor("Xd", 0, 128, 0); // verde
+        ggb.evalCommand(`Xi = (${xi}, f(${xi}))`);
+        ggb.evalCommand(`Xd = (${xd}, f(${xd}))`);
+        ggb.setPointSize("Xi", 4); ggb.setPointSize("Xd", 4);
+        ggb.setColor("Xi", 0, 0, 255);
+        ggb.setColor("Xd", 0, 128, 0);
 
-        // Si hay raíz encontrada, marcarla como punto rojo
         if (raiz !== undefined && !isNaN(raiz)) {
             ggb.evalCommand(`A = (${raiz}, f(${raiz}))`);
             ggb.setPointSize("A", 6);
-            ggb.setColor("A", 255, 0, 0); // rojo
+            ggb.setColor("A", 255, 0, 0);
         }
+
+        // encuadre automático usando f(xi), f(xd)
+        const yi = ggb.getValue(`f(${xi})`);
+        const yd = ggb.getValue(`f(${xd})`);
+        const yMin = Math.min(yi, yd, 0);
+        const yMax = Math.max(yi, yd, 0);
+        const yPad = Math.max(1, (yMax - yMin) * 0.2);
+        ggb.setCoordSystem(
+            Math.min(xi, xd) - 1,
+            Math.max(xi, xd) + 1,
+            yMin - yPad,
+            yMax + yPad
+        );
     } catch (err) {
         console.error("Error al graficar en GeoGebra:", err);
     }
+}
+
+
+function renderNumero(n, dec = 4) {
+    if (n === null || n === undefined || isNaN(n)) return '-';
+    return Number(n).toFixed(dec);  // siempre 4 decimales
+}
+
+
+function renderResultado(data, req) {
+    const grid = document.getElementById('res-grid');
+    if (!grid) return;
+
+    const xr = (data.Xr ?? data.xr);
+    const it = (data.iteraciones ?? data.Iteraciones ?? '-');
+    const err = data.error;
+    const conv = (data.converge ?? data.Converge ?? true);
+
+    grid.innerHTML = `
+    <div class="stat">
+      <div class="label">Raíz (xr)</div>
+      <div class="value">${renderNumero(xr, 6)}</div>
+    </div>
+    <div class="stat">
+      <div class="label">Iteraciones</div>
+      <div class="value">${it}</div>
+    </div>
+    <div class="stat">
+      <div class="label">Error</div>
+      <div class="value">${renderNumero(err, 6)}</div>
+    </div>
+    <div class="stat">
+      <div class="label">Converge</div>
+      <div class="value">${String(conv)}</div>
+    </div>
+    <div class="stat">
+      <div class="label">Intervalo [Xi, Xd]</div>
+      <div class="value">[ ${renderNumero(req.Xi, 4)} , ${renderNumero(req.Xd, 4)} ]</div>
+    </div>
+    <div class="stat">
+      <div class="label">Tolerancia</div>
+      <div class="value">${renderNumero(req.Tolerancia, 6)}</div>
+    </div>`;
+}
+
+function num(n, dec = 4) {  // siempre con 4 decimales: 0.0000
+    if (n === null || n === undefined || isNaN(n)) return '-';
+    return Number(n).toFixed(dec);
+}
+
+function renderResultado(data, req) {
+    const grid = document.getElementById('res-grid');
+    if (!grid) return;
+
+    const xr = (data.Xr ?? data.xr);
+    const it = (data.iteraciones ?? data.Iteraciones ?? '-');
+    const err = data.error;
+    const conv = (data.converge ?? data.Converge ?? true);
+
+    grid.innerHTML = `
+    <div class="stat"><div class="label">Raíz (xr)</div><div class="value">${num(xr, 6)}</div></div>
+    <div class="stat"><div class="label">Iteraciones</div><div class="value">${it}</div></div>
+    <div class="stat"><div class="label">Error</div><div class="value">${num(err, 6)}</div></div>
+    <div class="stat"><div class="label">Converge</div><div class="value">${String(conv)}</div></div>
+    <div class="stat"><div class="label">Intervalo [Xi, Xd]</div><div class="value">[ ${num(req.Xi, 4)} , ${num(req.Xd, 4)} ]</div></div>
+    <div class="stat"><div class="label">Tolerancia</div><div class="value">${num(req.Tolerancia, 6)}</div></div>
+  `;
 }
