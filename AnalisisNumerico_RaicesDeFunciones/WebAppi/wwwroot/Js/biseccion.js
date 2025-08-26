@@ -54,25 +54,23 @@ document.getElementById("form-biseccion").addEventListener("submit", async funct
 
 
 
-        // === Para GeoGebra: normalizar sintaxis ===
         function convertirFuncionParaGeoGebra(fx) {
             let s = String(fx);
 
             // e^(...)  -> exp(...)
-            s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, 'exp($1)');      // e^(x+1)
-            // e^x      -> exp(x)   (x puede ser x, -x, 2*x, x^2, etc. hasta separador)
-            s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, 'exp($1)'); // e^-x, e^x^2 (simple)
+            s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, 'exp($1)');
+            // e^x      -> exp(x)
+            s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, 'exp($1)');
 
-            // Nombres de funciones
-            s = s.replace(/Abs/gi, "abs")
+            return s
+                .replace(/Abs/gi, "abs")
                 .replace(/Log10/gi, "log10")
-                .replace(/Log/gi, "log")   // natural
+                .replace(/Log/gi, "log")
                 .replace(/Ln/gi, "ln")
-                .replace(/Exp/gi, "exp")   // por si escriben Exp(x)
+                .replace(/Exp/gi, "exp")
                 .replace(/Sen/gi, "sin");
-
-            return s;
         }
+
 
 
         // === Para LaTeX (mostrar bonito en el header) ===
@@ -82,25 +80,26 @@ document.getElementById("form-biseccion").addEventListener("submit", async funct
             // |...|
             s = s.replace(/Abs\s*\(([^()]+)\)/gi, '\\left|$1\\right|');
 
-            // exp(...) -> e^{...}
-            s = s.replace(/\bExp\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}');
+            // exp(...)  -> e^{...}
+            s = s.replace(/\bexp\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}'); // exp(x) -> e^{x}
+            s = s.replace(/\bExp\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}'); // Exp(x) -> e^{x}
 
-            // e^(...) -> e^{...}
+            // e^(...)   -> e^{...}
             s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}');
-            // e^x -> e^{x}  (x simple: x, -x, x^2, 2x, etc. sin espacios)
+            // e^x       -> e^{x} (x simple: x, -x, x^2, 2x, etc., sin espacios/operadores)
             s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, '\\mathrm{e}^{$1}');
 
             // funciones estándar
             s = s.replace(/\bLn\(/gi, '\\ln(')
                 .replace(/\bLog\(/gi, '\\log(');
 
-            // 3*x -> 3x
+            // 3*x -> 3x   y resto de * como ·
             s = s.replace(/(\d)\s*\*\s*x/gi, '$1x');
-            // resto de * como ·
             s = s.replace(/\*/g, '\\cdot ');
 
             return s;
         }
+
 
 
         // Renderiza el LaTeX en el banner f(x)= ...
