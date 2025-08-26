@@ -54,38 +54,54 @@ document.getElementById("form-biseccion").addEventListener("submit", async funct
 
 
 
-        // GeoGebra: Abs/Log/Ln/Exp/Sen -> sintaxis compatible
+        // === Para GeoGebra: normalizar sintaxis ===
         function convertirFuncionParaGeoGebra(fx) {
-            return String(fx)
-                .replace(/Abs/gi, "abs")
+            let s = String(fx);
+
+            // e^(...)  -> exp(...)
+            s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, 'exp($1)');      // e^(x+1)
+            // e^x      -> exp(x)   (x puede ser x, -x, 2*x, x^2, etc. hasta separador)
+            s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, 'exp($1)'); // e^-x, e^x^2 (simple)
+
+            // Nombres de funciones
+            s = s.replace(/Abs/gi, "abs")
                 .replace(/Log10/gi, "log10")
-                .replace(/Log/gi, "log")
+                .replace(/Log/gi, "log")   // natural
                 .replace(/Ln/gi, "ln")
-                .replace(/Exp/gi, "exp")
+                .replace(/Exp/gi, "exp")   // por si escriben Exp(x)
                 .replace(/Sen/gi, "sin");
+
+            return s;
         }
 
-        // LaTeX para mostrar en pantalla (3x en vez de 3*x, | | para abs)
+
+        // === Para LaTeX (mostrar bonito en el header) ===
         function toLatexFromInput(fx) {
             let s = String(fx).trim();
 
-            // valor absoluto: Abs(expr) -> |expr|
+            // |...|
             s = s.replace(/Abs\s*\(([^()]+)\)/gi, '\\left|$1\\right|');
 
-            // funciones conocidas a LaTeX
-            s = s.replace(/\bLn\(/gi, '\\ln(')
-                .replace(/\bLog\(/gi, '\\log(')
-                .replace(/\bExp\(/gi, '\\exp(')
-                .replace(/\bSqrt\(/gi, '\\sqrt{');
+            // exp(...) -> e^{...}
+            s = s.replace(/\bExp\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}');
 
-            // 3*x -> 3x  (número seguido de * y x)
+            // e^(...) -> e^{...}
+            s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}');
+            // e^x -> e^{x}  (x simple: x, -x, x^2, 2x, etc. sin espacios)
+            s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, '\\mathrm{e}^{$1}');
+
+            // funciones estándar
+            s = s.replace(/\bLn\(/gi, '\\ln(')
+                .replace(/\bLog\(/gi, '\\log(');
+
+            // 3*x -> 3x
             s = s.replace(/(\d)\s*\*\s*x/gi, '$1x');
-            // a*(b) -> a·(b) (multiplicación general como ·)
+            // resto de * como ·
             s = s.replace(/\*/g, '\\cdot ');
 
-            // Potencias: ya funciona con ^, pero si hay algo como (x+1)^2 también es válido
             return s;
         }
+
 
         // Renderiza el LaTeX en el banner f(x)= ...
         function updatePretty() {

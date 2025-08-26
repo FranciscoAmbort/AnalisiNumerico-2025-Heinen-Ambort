@@ -41,6 +41,9 @@ function toLatexFromInput(fx) {
         .replace(/\bExp\(/gi, '\\exp(');
     s = s.replace(/(\d)\s*\*\s*x/gi, '$1x');
     s = s.replace(/\*/g, '\\cdot ');
+    // e^(...)
+    s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}'); // e^(x+1) -> e^{x+1}
+    s = s.replace(/\be\s*\^\s*([a-zA-Z0-9]+)\b/gi, '\\mathrm{e}^{$1}');   // e^x -> e^{x}
     return s;
 }
 
