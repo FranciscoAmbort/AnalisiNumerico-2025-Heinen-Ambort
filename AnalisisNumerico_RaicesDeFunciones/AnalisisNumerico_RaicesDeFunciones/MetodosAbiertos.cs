@@ -49,7 +49,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
                 {
                     res.Xr = xr;
                     res.Iteraciones = i;
-                    res.Error = Math.Abs(xr - xrAnterior / xr);
+                    res.Error = Math.Abs((xr - xrAnterior) / xr);
                     res.Converge = false;
                     return res;
                 }
@@ -115,7 +115,7 @@ namespace AnalisisNumerico_RaicesDeFunciones
             }
 
             double xr = 0;
-            double xrAnterior = 0;
+            double xrAnterior = xd;
             double error = 1;
 
             for (int i = 1; i <= request.MaxIteraciones; i++) {
@@ -126,11 +126,12 @@ namespace AnalisisNumerico_RaicesDeFunciones
                     res.Xr = xd;
                     res.Iteraciones = i;
                     res.Error = error;
-                    res.Converge = true;
+                    res.Converge = false;
                     return res;
                 }
 
                 xr = (fxd * xi - fxi * xd) / denominador;
+                error = Math.Abs((xr - xrAnterior) / xr);
                 double fxr = calculo.EvaluaFx(xr);
 
                 if (Math.Abs(fxr) < request.Tolerancia || error < request.Tolerancia)
