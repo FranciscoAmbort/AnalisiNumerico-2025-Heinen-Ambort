@@ -13,8 +13,7 @@ window.addEventListener("load", function () {
             ggb = api;
             try { ggb.setPerspective && ggb.setPerspective("G"); } catch (e) { }
             try { ggb.setGridVisible(true); ggb.setAxesVisible(true, true); } catch (e) { }
-            // pintar función al cargar si hay algo escrito
-            updatePretty();
+            updatePretty(); // pintar función si ya hay algo
             console.log("GeoGebra listo");
         }
     }, true);
@@ -24,7 +23,15 @@ window.addEventListener("load", function () {
 
 // ================== Helpers ==================
 function convertirFuncionParaGeoGebra(fx) {
-    return String(fx)
+    // GeoGebra NO entiende e^x, pero sí exp(x)
+    let s = String(fx);
+
+    // e^(...) -> exp(...)
+    s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, 'exp($1)');
+    // e^x -> exp(x)   (x "simple": sin + - * / ni paréntesis)
+    s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, 'exp($1)');
+
+    return s
         .replace(/Abs/gi, "abs")
         .replace(/Log10/gi, "log10")
         .replace(/Log/gi, "log")
@@ -33,29 +40,88 @@ function convertirFuncionParaGeoGebra(fx) {
         .replace(/Sen/gi, "sin");
 }
 
-// Abs(…) -> |…|, 3*x -> 3x, * -> · (en LaTeX)
+// --- Convierte exp( ... ) -> \mathrm{e}^{ ... } con paréntesis anidados
+function replaceExpToE(s) {
+    let i = 0, out = "", S = String(s);
+    const re = /\bexp\s*\(/i;
+    while (i < S.length) {
+        const rest = S.slice(i);
+        const m = rest.match(re);
+        if (!m) { out += rest; break; }
+        const start = i + m.index;               // inicio de "exp("
+        const openLen = m[0].length;             // longitud de "exp("
+        out += S.slice(i, start);                 // copia lo previo
+        let j = start + openLen;                  // arranca después de "("
+        let depth = 1;
+        // avanza hasta el paréntesis que cierra este "exp("
+        while (j < S.length && depth > 0) {
+            const ch = S[j];
+            if (ch === '(') depth++;
+            else if (ch === ')') depth--;
+            j++;
+        }
+        const inner = S.slice(start + openLen, j - 1); // lo de adentro
+        out += `\\mathrm{e}^{${inner}}`;
+        i = j; // continuar desde después del cierre
+    }
+    return out;
+}
+
 function toLatexFromInput(fx) {
     let s = String(fx).trim();
+
+    // |...|
     s = s.replace(/Abs\s*\(([^()]+)\)/gi, '\\left|$1\\right|');
+
+    // 1) primero: \exp(...) -> e^{...}
+    s = s.replace(/\\exp\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}');
+
+    // 2) luego: exp(...) con paréntesis anidados -> e^{...}
+    s = replaceExpToE(s);
+
+    // 3) e^(...) -> e^{...}
+    s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}');
+    // 4) e^x -> e^{x}  (x simple)
+    s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, '\\mathrm{e}^{$1}');
+
+    // funciones estándar
     s = s.replace(/\bLn\(/gi, '\\ln(')
-        .replace(/\bLog\(/gi, '\\log(')
-        .replace(/\bExp\(/gi, '\\exp(');
+        .replace(/\bLog10\(/gi, '\\log_{10}(')
+        .replace(/\bLog\(/gi, '\\log(');
+
+    // 3*x -> 3x ; * -> ·
     s = s.replace(/(\d)\s*\*\s*x/gi, '$1x');
     s = s.replace(/\*/g, '\\cdot ');
-    // e^(...)
-    s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, '\\mathrm{e}^{$1}'); // e^(x+1) -> e^{x+1}
-    s = s.replace(/\be\s*\^\s*([a-zA-Z0-9]+)\b/gi, '\\mathrm{e}^{$1}');   // e^x -> e^{x}
+
     return s;
+}
+
+// Renderiza LaTeX usando la API de MathJax (evita problemas de delimitadores y timing)
+async function renderLatex(el, latexInline) {
+    if (window.MathJax && MathJax.tex2chtmlPromise) {
+        const node = await MathJax.tex2chtmlPromise(latexInline, { display: false });
+        el.innerHTML = "";
+        el.appendChild(node);
+        MathJax.startup.document.clear();
+        MathJax.startup.document.updateDocument();
+    } else {
+        // Fallback: delimitadores clásicos
+        el.textContent = `\\( ${latexInline} \\)`;
+        if (window.MathJax && MathJax.typesetPromise) {
+            try { MathJax.typesetClear && MathJax.typesetClear([el]); } catch (e) { }
+            await MathJax.typesetPromise([el]);
+        }
+    }
 }
 
 function updatePretty() {
     const raw = document.getElementById('funcion')?.value || '';
-    const latex = toLatexFromInput(raw);
+    const latex = toLatexFromInput(raw);       // aquí ya debería salir \mathrm{e}^{x}
     const el = document.getElementById('fx-pretty');
     if (!el) return;
-    el.textContent = `\\( ${latex} \\)`;
-    if (window.MathJax) { MathJax.typesetPromise([el]); }
+    renderLatex(el, latex);
 }
+
 
 // número con decimales fijos
 function num(n, dec = 6) {
@@ -149,7 +215,6 @@ document.getElementById("form-reglafalsa").addEventListener("submit", async func
             updatePretty(); // refresca f(x) arriba
             graficarEnGeoGebra(requestData.Funcion, (data.Xr ?? data.xr), requestData.Xi, requestData.Xd);
         }
-
     } catch (error) {
         console.error(error);
         renderResultado({ xr: '-', iteraciones: '-', error: 'Error de conexión', converge: false }, requestData);
@@ -158,3 +223,4 @@ document.getElementById("form-reglafalsa").addEventListener("submit", async func
 
 // refrescar f(x) mientras escriben
 document.getElementById('funcion').addEventListener('input', updatePretty);
+window.addEventListener('load', updatePretty);
