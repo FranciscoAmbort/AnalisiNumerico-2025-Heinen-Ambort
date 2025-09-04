@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalisisNumerico_RaicesDeFu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppi", "WebAppi\WebAppi.csproj", "{05234E10-880D-40BD-8C1A-C4AEDD747156}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalisisNumerico_SistemasDeEcuaciones", "AnalisisNumerico_SistemasDeEcuaciones\AnalisisNumerico_SistemasDeEcuaciones.csproj", "{C8F19D8B-F62C-42B6-8202-8A9053C2A3AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05234E10-880D-40BD-8C1A-C4AEDD747156}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8F19D8B-F62C-42B6-8202-8A9053C2A3AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8F19D8B-F62C-42B6-8202-8A9053C2A3AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8F19D8B-F62C-42B6-8202-8A9053C2A3AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8F19D8B-F62C-42B6-8202-8A9053C2A3AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
