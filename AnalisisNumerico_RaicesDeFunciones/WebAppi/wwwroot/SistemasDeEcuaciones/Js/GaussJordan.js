@@ -56,16 +56,36 @@ function calcular() {
     const tolerancia = parseFloat(document.getElementById("tolerance").value);
     const iteraciones = parseInt(document.getElementById("iterations").value);
 
-    // Mostrar en consola (o enviar al backend)
-    console.log("Matriz A:", A);
-    console.log("Vector b:", b);
-    console.log("Tolerancia:", tolerancia);
-    console.log("Iteraciones:", iteraciones);
+    const datos = {
+        A,
+        b,
+        tolerancia,
+        iteraciones
+    };
 
-    // Simulación de respuesta (podés reemplazar esto por un fetch al backend)
     const resultado = document.getElementById("resultado");
-    resultado.innerHTML = `
-    <p><strong>Ejemplo de cómo se procesaría:</strong></p>
-    <pre>${JSON.stringify({ A, b, tolerancia, iteraciones }, null, 2)}</pre>
-  `;
+    resultado.innerHTML = `<p>Calculando...</p>`;
+
+    // 🔁 Petición real al backend
+    fetch("https://localhost:7114/api/sistemas/gaussjordan", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datos)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Error en la respuesta del servidor");
+            return response.json();
+        })
+        .then(solucion => {
+            resultado.innerHTML = `
+            <h4>Resultado:</h4>
+            <pre>${JSON.stringify(solucion, null, 2)}</pre>
+        `;
+        })
+        .catch(error => {
+            resultado.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            console.error("Error al hacer el cálculo:", error);
+        });
 }

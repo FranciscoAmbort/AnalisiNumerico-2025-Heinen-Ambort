@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace AnalisisNumerico_SistemasDeEcuaciones
 {
-    internal class RequestGaussJordan
+    public class RequestGaussJordan
     {
+        public double[][] A { get; set; }
+        public double[] b { get; set; }
+        public double Tolerancia { get; set; }
+        public int Iteraciones { get; set; }
     }
 }
