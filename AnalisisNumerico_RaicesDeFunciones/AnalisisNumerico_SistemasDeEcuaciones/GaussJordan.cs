@@ -23,9 +23,7 @@ namespace AnalisisNumerico_SistemasDeEcuaciones
                 matriz[i, dimension] = request.b[i]; // Cargamos b en la última columna
             }
 
-            // ===============================
             // PASO 1: Recorremos cada fila-pivote (diagonal principal)
-            // ===============================
             for (int rowDiag = 0; rowDiag < dimension; rowDiag++)
             {
                 // Paso 2.a: Tomar el coeficiente de la diagonal principal
@@ -51,9 +49,7 @@ namespace AnalisisNumerico_SistemasDeEcuaciones
                 }
             }
 
-            // ===============================
             // PASO 3: Extraer el vector solución desde la última columna
-            // ===============================
             double[] resultado = new double[dimension];
             for (int i = 0; i < dimension; i++)
                 resultado[i] = matriz[i, dimension];

@@ -23,6 +23,22 @@ namespace WebAppi.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+        [HttpPost("gaussseidel")]
+        public ActionResult<double[]> ResolverGaussSeidel([FromBody] RequestGaussJordan request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var resultado = GaussSeidel.Resolver(request);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }
 
