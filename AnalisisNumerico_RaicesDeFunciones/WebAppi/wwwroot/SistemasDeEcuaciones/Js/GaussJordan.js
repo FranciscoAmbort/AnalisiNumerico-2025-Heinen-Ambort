@@ -79,13 +79,37 @@ function calcular() {
             return response.json();
         })
         .then(solucion => {
-            resultado.innerHTML = `
-            <h4>Resultado:</h4>
-            <pre>${JSON.stringify(solucion, null, 2)}</pre>
-        `;
+            pintarBonitoResultado(solucion, "Gauss-Jordan");
         })
         .catch(error => {
             resultado.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
             console.error("Error al hacer el cálculo:", error);
         });
 }
+function pintarBonitoResultado(solucion, metodo) {
+    // Normalizar: soporta [..] o { resultado: [..] } o un objeto plano
+    let arr = Array.isArray(solucion)
+        ? solucion
+        : (Array.isArray(solucion?.resultado) ? solucion.resultado : Object.values(solucion));
+
+    arr = arr.map(n => Number(n)); // asegurar números
+
+    const resultado = document.getElementById("resultado");
+    resultado.innerHTML = `
+    <div class="res-card">
+      <div class="res-header">
+        <span>Resultado del sistema</span>
+        <span class="badge">${metodo}</span>
+      </div>
+      <div class="res-grid">
+        ${arr.map((val, idx) => `
+          <div class="stat">
+            <div class="label">x<sub>${idx + 1}</sub></div>
+            <div class="value">${Number.isFinite(val) ? val.toFixed(9) : "-"}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
