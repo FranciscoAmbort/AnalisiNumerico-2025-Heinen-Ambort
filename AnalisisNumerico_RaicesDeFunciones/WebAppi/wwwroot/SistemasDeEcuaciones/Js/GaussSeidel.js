@@ -96,7 +96,11 @@ function calcular() {
         body: JSON.stringify(datos)
     })
         .then(response => {
-            if (!response.ok) throw new Error("Error en la respuesta del servidor");
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error || "Error en la respuesta del servidor");
+                });
+            }
             return response.json();
         })
         .then(solucion => {
