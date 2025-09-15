@@ -10,7 +10,7 @@
     const thead = document.createElement("thead");
     const trHead = document.createElement("tr");
 
-    const nombres = ["x", "y", "z", "w"]; // primeros 4 como en tu diseño
+    const nombres = ["x", "y", "z", "w", "v"]; // primeros 4 como en tu diseño
     for (let j = 0; j < n; j++) {
         const th = document.createElement("th");
         th.textContent = nombres[j] ?? `x${j + 1}`; // si hay más de 4: x5, x6...
@@ -128,9 +128,9 @@ function pintarBonitoResultado(solucion, metodo) {
       <div class="res-grid">
         ${arr.map((val, idx) => `
           <div class="stat">
-<div class="label">${
-            ["x", "y", "z", "w"][idx] ?? `x${idx + 1}`
-}</div>
+          <div class="label">${
+            ["x", "y", "z", "w", "v"][idx] ?? `x${idx + 1}`
+          }</div>
             <div class="value">${Number.isFinite(val) ? val.toFixed(9) : "-"}</div>
           </div>
         `).join("")}

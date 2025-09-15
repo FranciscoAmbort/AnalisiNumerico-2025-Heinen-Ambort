@@ -10,7 +10,7 @@
     const thead = document.createElement("thead");
     const trHead = document.createElement("tr");
 
-    const nombres = ["x", "y", "z", "w"]; // primeros 4 como en tu diseño
+    const nombres = ["x", "y", "z", "w", "v"]; // primeros 4 como en tu diseño
     for (let j = 0; j < n; j++) {
         const th = document.createElement("th");
         th.textContent = nombres[j] ?? `x${j + 1}`; // si hay más de 4: x5, x6...
@@ -79,7 +79,13 @@ function calcular() {
     const tolerancia = parseFloat(document.getElementById("tolerance").value);
     const iteraciones = parseInt(document.getElementById("iterations").value);
 
-    const datos = { A, b, tolerancia, iteraciones };
+    const datos = {
+        A,
+        b,
+        Tolerancia: tolerancia,
+        Iteraciones: iteraciones
+    };
+
 
     const resultado = document.getElementById("resultado");
     resultado.innerHTML = `<p>Calculando...</p>`;
@@ -120,7 +126,7 @@ function pintarBonitoResultado(solucion, metodo) {
         ${arr.map((val, idx) => `
           <div class="stat">
             <div class="label">${
-            ["x", "y", "z", "w"][idx] ?? `x${idx + 1}`
+            ["x", "y", "z", "w", "v"][idx] ?? `x${idx + 1}`
             }</div>
             <div class="value">${Number.isFinite(val) ? val.toFixed(9) : "-"}</div>
           </div>
