@@ -60,7 +60,6 @@
 }
 
 
-
 function calcular() {
     const size = parseInt(document.getElementById("size").value);
     const A = [];
@@ -129,7 +128,9 @@ function pintarBonitoResultado(solucion, metodo) {
       <div class="res-grid">
         ${arr.map((val, idx) => `
           <div class="stat">
-            <div class="label">x<sub>${idx + 1}</sub></div>
+<div class="label">${
+            ["x", "y", "z", "w"][idx] ?? `x${idx + 1}`
+}</div>
             <div class="value">${Number.isFinite(val) ? val.toFixed(9) : "-"}</div>
           </div>
         `).join("")}

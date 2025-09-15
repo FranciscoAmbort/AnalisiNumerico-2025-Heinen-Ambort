@@ -235,16 +235,18 @@ input, button {
     background: #050a15;
 }
 
-/* Tarjetas de resultado */
 .res-card {
     background: linear-gradient(180deg,#0f172a,#0b1324);
     border: 1px solid rgba(0,255,136,.25);
     border-radius: 12px;
     box-shadow: 0 12px 30px rgba(0,255,136,.12), 0 0 0 1px rgba(0,255,136,.15) inset;
-    padding: 14px;
-    margin: 12px 0;
+    padding: 20px; /* más padding */
+    margin: 20px auto;
     color: #e5e7eb;
+    max-width: 700px; /* agranda el ancho */
+    font-size: 1.1rem; /* agranda fuente interna */
 }
+
 
 .res-header {
     display: flex;
