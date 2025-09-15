@@ -322,3 +322,12 @@ input, button {
 #fx-pretty {
     font-size: 18px;
 }
+
+.matriz { border-collapse: collapse; width: auto; }
+.matriz th { background: #eef2f7; font-weight: 700; text-align: center; padding: 8px 10px; border: 1px solid #d9dde3; }
+.matriz td { border: 1px solid #e5e7eb; padding: 4px 6px; }
+.matriz input { width: 90px; text-align: center; border: none; background: transparent; font-size: 14px; }
+.matriz input:focus { outline: none; border-bottom: 2px solid #4caf50; }
+
+.ti-header { background: #e6f0ff; }      /* cabecera TI distinta */
+.ti-cell input { background: #f5f9ff; font-weight: 700; }  /* inputs TI resaltados */

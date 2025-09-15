@@ -1,40 +1,65 @@
 ﻿function generarMatriz() {
-    const size = parseInt(document.getElementById("size").value);
+    const n = parseInt(document.getElementById("size").value);
     const container = document.getElementById("matrix");
-
-    container.innerHTML = ""; // limpia contenido anterior
+    container.innerHTML = "";
 
     const tabla = document.createElement("table");
     tabla.classList.add("matriz");
 
-    for (let i = 0; i < size; i++) {
-        const fila = document.createElement("tr");
+    // ---- THEAD: x, y, z, w, ... , TI ----
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
 
-        // Inputs para los coeficientes (A)
-        for (let j = 0; j < size; j++) {
-            const celda = document.createElement("td");
-            const input = document.createElement("input");
-            input.type = "number";
-            input.id = `a-${i}-${j}`;
-            input.step = "any";
-            celda.appendChild(input);
-            fila.appendChild(celda);
-        }
-
-        // Input para el término independiente (b)
-        const celdaTI = document.createElement("td");
-        const inputTI = document.createElement("input");
-        inputTI.type = "number";
-        inputTI.id = `b-${i}`;
-        inputTI.step = "any";
-        celdaTI.appendChild(inputTI);
-        fila.appendChild(celdaTI);
-
-        tabla.appendChild(fila);
+    const nombres = ["x", "y", "z", "w"]; // primeros 4 como en tu diseño
+    for (let j = 0; j < n; j++) {
+        const th = document.createElement("th");
+        th.textContent = nombres[j] ?? `x${j + 1}`; // si hay más de 4: x5, x6...
+        trHead.appendChild(th);
     }
 
+    const thTi = document.createElement("th");
+    thTi.textContent = "TI";
+    thTi.classList.add("ti-header");
+    trHead.appendChild(thTi);
+
+    thead.appendChild(trHead);
+    tabla.appendChild(thead);
+
+    // ---- TBODY con inputs ----
+    const tbody = document.createElement("tbody");
+
+    for (let i = 0; i < n; i++) {
+        const tr = document.createElement("tr");
+
+        // coeficientes A
+        for (let j = 0; j < n; j++) {
+            const td = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "number";
+            input.step = "any";
+            input.id = `a-${i}-${j}`;
+            td.appendChild(input);
+            tr.appendChild(td);
+        }
+
+        // término independiente b
+        const tdTi = document.createElement("td");
+        tdTi.classList.add("ti-cell");
+        const inputTi = document.createElement("input");
+        inputTi.type = "number";
+        inputTi.step = "any";
+        inputTi.id = `b-${i}`;
+        tdTi.appendChild(inputTi);
+        tr.appendChild(tdTi);
+
+        tbody.appendChild(tr);
+    }
+
+    tabla.appendChild(tbody);
     container.appendChild(tabla);
 }
+
+
 
 function calcular() {
     const size = parseInt(document.getElementById("size").value);
