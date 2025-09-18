@@ -43,7 +43,7 @@
 
                     double coefDiag = matriz[row, row];
                     if (coefDiag == 0)
-                        throw new Exception($"Pivote nulo en la fila {row}");
+                        throw new Exception($"Pivote nulo en diagonal principal");
 
                     vectorResultado[row] = suma / coefDiag;
                 }

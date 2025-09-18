@@ -29,7 +29,7 @@ namespace AnalisisNumerico_SistemasDeEcuaciones
                 // Paso 2.a: Tomar el coeficiente de la diagonal principal
                 double coefDiag = matriz[rowDiag, rowDiag];
                 if (coefDiag == 0)
-                    throw new Exception($"División por cero en fila {rowDiag} (pivote nulo)");
+                    throw new Exception($"División por cero en diagonal principal (pivote nulo)");
 
                 // Paso 2.b: Normalizar toda la fila dividiendo por el coeficiente de la diagonal
                 for (int col = 0; col < dimension + 1; col++)
