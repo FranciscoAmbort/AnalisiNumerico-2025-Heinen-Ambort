@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajustes de Curvas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="contenedor">
+        <div class="panel-izq">
+            <h1>Ajustes de Curvas</h1>
+            <table id="pointsTable">
+                <thead>
+                    <tr><th>X</th><th>Y</th></tr>
+                </thead>
+                <tbody>
+                    <!-- Filas dinámicas -->
+                </tbody>
+            </table>
+            <button id="addPointBtn">Agregar Punto</button>
+            <br>
+            <button id="calculateBtn">Calcular</button>
+        </div>
+
+        <div class="panel-der">
+            <canvas id="grafico" width="400" height="400"></canvas>
+
+            <div class="resultados">
+                <p><strong>Función:</strong> <span id="funcion">-</span></p>
+                <p><strong>Correlación:</strong> <span id="correlacion">-</span></p>
+                <p><strong>Ajuste:</strong> <span id="ajuste">-</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
