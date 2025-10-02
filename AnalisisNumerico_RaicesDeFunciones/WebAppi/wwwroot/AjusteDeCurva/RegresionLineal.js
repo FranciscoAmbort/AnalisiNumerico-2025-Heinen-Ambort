@@ -1,118 +1,66 @@
 ﻿
-document.addEventListener("DOMContentLoaded", function () {
-    const addPointBtn = document.getElementById("addPointBtn");
-    const calculateBtn = document.getElementById("calculateBtn");
-    const tableBody = document.getElementById("pointsTable").querySelector("tbody");
+// Referencias a elementos
+const tabla = document.getElementById("tabla-puntos").getElementsByTagName("tbody")[0];
+const btnAgregar = document.getElementById("agregar-punto");
+const btnCalcular = document.getElementById("calcular");
+const canvas = document.getElementById("grafico");
+const ctx = canvas.getContext("2d");
 
-    const funcionEl = document.getElementById("funcion");
-    const correlacionEl = document.getElementById("correlacion");
-    const ajusteEl = document.getElementById("ajuste");
+// Resultados
+const funcionSpan = document.getElementById("funcion");
+const correlacionSpan = document.getElementById("correlacion");
+const efectividadSpan = document.getElementById("efectividad");
 
-    let chart;
+// --- Agregar nueva fila ---
+btnAgregar.addEventListener("click", () => {
+    let fila = tabla.insertRow();
+    let cellX = fila.insertCell(0);
+    let cellY = fila.insertCell(1);
+    cellX.innerHTML = `<input type="number" value="0">`;
+    cellY.innerHTML = `<input type="number" value="0">`;
+});
 
-    addPointBtn.addEventListener("click", () => {
-        const row = tableBody.insertRow();
-        const cellX = row.insertCell(0);
-        const cellY = row.insertCell(1);
+const btnEliminar = document.getElementById("eliminar-punto");
 
-        const inputX = document.createElement("input");
-        inputX.type = "number";
-        inputX.step = "any";
-
-        const inputY = document.createElement("input");
-        inputY.type = "number";
-        inputY.step = "any";
-
-        cellX.appendChild(inputX);
-        cellY.appendChild(inputY);
-    });
-
-    calculateBtn.addEventListener("click", () => {
-        const puntos = [];
-
-        const rows = tableBody.querySelectorAll("tr");
-        for (const row of rows) {
-            const x = parseFloat(row.cells[0].querySelector("input").value);
-            const y = parseFloat(row.cells[1].querySelector("input").value);
-
-            if (!isNaN(x) && !isNaN(y)) {
-                puntos.push([x, y]);
-            }
-        }
-
-        if (puntos.length < 2) {
-            alert("Debe ingresar al menos dos puntos válidos.");
-            return;
-        }
-
-        fetch("http://localhost:5000/api/regresion-lineal", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ puntos: puntos, tolerancia: 0.8 })
-        })
-            .then(res => res.json())
-            .then(data => {
-                funcionEl.textContent = data.funcion;
-                correlacionEl.textContent = data.correlacion.toFixed(2) + " %";
-                ajusteEl.textContent = data.efectividadAjuste;
-
-                dibujarGrafico(puntos, data.funcion);
-            })
-            .catch(error => {
-                console.error("Error en el cálculo:", error);
-            });
-    });
-
-    function dibujarGrafico(puntos, funcion) {
-        const ctx = document.getElementById("grafico").getContext("2d");
-
-        const xs = puntos.map(p => p[0]);
-        const match = funcion.match(/y\s*=\s*([-\d.]+)x\s*([+-])\s*([\d.]+)/);
-
-        let a = 0, b = 0;
-        if (match) {
-            a = parseFloat(match[1]);
-            b = parseFloat(match[3]) * (match[2] === "-" ? -1 : 1);
-        }
-
-        const lineData = [];
-        const xMin = Math.min(...xs) - 1;
-        const xMax = Math.max(...xs) + 1;
-
-        for (let x = xMin; x <= xMax; x += 0.5) {
-            lineData.push({ x: x, y: a * x + b });
-        }
-
-        if (chart) chart.destroy();
-
-        chart = new Chart(ctx, {
-            type: "scatter",
-            data: {
-                datasets: [
-                    {
-                        label: "Puntos",
-                        data: puntos.map(p => ({ x: p[0], y: p[1] })),
-                        backgroundColor: "blue",
-                    },
-                    {
-                        label: "Ajuste Lineal",
-                        type: "line",
-                        data: lineData,
-                        borderColor: "red",
-                        borderWidth: 2,
-                        fill: false,
-                        pointRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: false,
-                scales: {
-                    x: { type: "linear", position: "bottom" }
-                }
-            }
-        });
+btnEliminar.addEventListener("click", () => {
+    let filas = tabla.rows.length;
+    if (filas > 2) { // deja al menos 2 filas mínimas
+        tabla.deleteRow(filas - 1);
+    } else {
+        alert("Debe haber al menos dos puntos para interpolar.");
     }
 });
+
+
+// --- Calcular regresión ---
+btnCalcular.addEventListener("click", async () => {
+    // 1. Tomar puntos
+    let puntos = [];
+    for (let fila of tabla.rows) {
+        let x = parseFloat(fila.cells[0].children[0].value);
+        let y = parseFloat(fila.cells[1].children[0].value);
+        puntos.push([x, y]);
+    }
+
+    // 2. Llamar a backend (ajusta URL a tu API real)
+    let response = await fetch("https://localhost:7114/api/RegresionLineal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            Puntos: puntos,
+            Tolerancia: 0.05
+        })
+    });
+
+    let data = await response.json();
+
+    // 3. Mostrar resultados
+    funcionSpan.textContent = data.funcion;
+    correlacionSpan.textContent = data.correlacion.toFixed(2) + " %";
+    efectividadSpan.textContent = data.efectividadAjuste;
+
+
+});
+
+// --- Función para graficar ---
+

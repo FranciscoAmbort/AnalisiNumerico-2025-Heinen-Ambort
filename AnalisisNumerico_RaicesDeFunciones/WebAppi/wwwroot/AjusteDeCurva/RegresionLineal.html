@@ -3,38 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Ajustes de Curvas</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="estilos.css"> <!-- tu CSS -->
 </head>
 <body>
+    <div class="container">
+        <h2>Ajustes de Curvas</h2>
 
-    <div class="contenedor">
-        <div class="panel-izq">
-            <h1>Ajustes de Curvas</h1>
-            <table id="pointsTable">
-                <thead>
-                    <tr><th>X</th><th>Y</th></tr>
-                </thead>
-                <tbody>
-                    <!-- Filas dinámicas -->
-                </tbody>
-            </table>
-            <button id="addPointBtn">Agregar Punto</button>
-            <br>
-            <button id="calculateBtn">Calcular</button>
-        </div>
+        <!-- Tabla de puntos -->
+        <table id="tabla-puntos">
+            <thead>
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="number" value="0"></td>
+                    <td><input type="number" value="0"></td>
+                </tr>
+                <tr>
+                    <td><input type="number" value="0"></td>
+                    <td><input type="number" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div class="panel-der">
-            <canvas id="grafico" width="400" height="400"></canvas>
+        <button id="agregar-punto">Agregar Punto</button>
+        <button id="eliminar-punto">Eliminar último punto</button>
+        <button id="calcular">Calcular</button>
 
-            <div class="resultados">
-                <p><strong>Función:</strong> <span id="funcion">-</span></p>
-                <p><strong>Correlación:</strong> <span id="correlacion">-</span></p>
-                <p><strong>Ajuste:</strong> <span id="ajuste">-</span></p>
-            </div>
+        <!-- Canvas para graficar -->
+        <canvas id="grafico" width="500" height="400"></canvas>
+
+        <!-- Resultado -->
+        <div id="resultado">
+            <p><strong>Función:</strong> <span id="funcion"></span></p>
+            <p><strong>Correlación:</strong> <span id="correlacion"></span></p>
+            <p><strong>Efectividad:</strong> <span id="efectividad"></span></p>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="RegresionLineal.js"></script>
 </body>
 </html>
 
