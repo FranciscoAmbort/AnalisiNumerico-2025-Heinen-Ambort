@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<MetodosCerrados>();
 builder.Services.AddScoped<MetodosAbiertos>();
 builder.Services.AddSingleton<RegresionLinealService>();
+builder.Services.AddScoped<RegresionPolinomialService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
