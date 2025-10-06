@@ -9,18 +9,32 @@ document.addEventListener("DOMContentLoaded", () => {
         width: 900, height: 520,
         showToolBar: false, showAlgebraInput: false, showMenuBar: false,
         perspective: "G", enableUndoRedo: false,
-        appletOnLoad: api => { ggbPoly = api; ggbPolyReadyResolve(); }
+        appletOnLoad: api => {
+            ggbPoly = api;
+            console.log("GeoGebra cargado correctamente.");
+            ggbPolyReadyResolve();
+        }
     };
+
+    // NO USAR .setHTML5Codebase porque genera error de Access Denied en localhost
     const app = new GGBApplet(params, true);
-    app.setHTML5Codebase('https://www.geogebra.org/apps/5.2/');
     app.inject('ggb-poly');
 });
 
-async function ggbClearPoly() { await ggbPolyReady; try { ggbPoly.evalCommand("Delete[All]"); } catch { } }
+async function ggbClearPoly() {
+    await ggbPolyReady;
+    try {
+        ggbPoly.evalCommand("Delete[All]");
+    } catch (e) {
+        console.warn("No se pudo limpiar GeoGebra", e);
+    }
+}
+
 async function ggbAddPointsPoly(pts) {
     await ggbPolyReady;
     pts.forEach((p, i) => ggbPoly.evalCommand(`P${i + 1}=(${p[0]},${p[1]})`));
 }
+
 function polyDef(coef) {
     const terms = coef.map((a, i) => {
         if (Math.abs(a) < 1e-12) return null;
@@ -30,6 +44,7 @@ function polyDef(coef) {
     }).filter(Boolean);
     return `f(x)=${terms.join("+")}`.replace(/\+\-/g, "-");
 }
+
 async function ggbPlotPoly(coef) {
     await ggbPolyReady;
     const def = polyDef(coef);
@@ -37,6 +52,7 @@ async function ggbPlotPoly(coef) {
     ggbPoly.setLineThickness("f", 5);
     ggbPoly.setColor("f", 34, 197, 94);
 }
+
 async function ggbFitPoly(pts) {
     await ggbPolyReady;
     if (pts.length === 0) return;
@@ -52,18 +68,24 @@ const rpTbody = document.getElementById("rp-tbody");
 document.getElementById("rp-add").addEventListener("click", () => {
     const tr = document.createElement("tr");
     tr.innerHTML = `<td><input type="number" step="any" value="0"/></td>
-                <td><input type="number" step="any" value="0"/></td>
-                <td><button class="row-del">✕</button></td>`;
+                    <td><input type="number" step="any" value="0"/></td>
+                    <td><button class="row-del">✕</button></td>`;
     rpTbody.appendChild(tr);
 });
-rpTbody.addEventListener("click", (e) => { if (e.target.classList.contains("row-del")) e.target.closest("tr").remove(); });
+rpTbody.addEventListener("click", (e) => {
+    if (e.target.classList.contains("row-del")) {
+        e.target.closest("tr").remove();
+    }
+});
 
 function leer() {
-    const pts = []; for (const tr of rpTbody.querySelectorAll("tr")) {
+    const pts = [];
+    for (const tr of rpTbody.querySelectorAll("tr")) {
         const x = parseFloat(tr.children[0].querySelector("input").value);
         const y = parseFloat(tr.children[1].querySelector("input").value);
         if (Number.isFinite(x) && Number.isFinite(y)) pts.push([x, y]);
-    } return pts;
+    }
+    return pts;
 }
 
 const END_POLI = "/api/RegresionPolinomial";
@@ -72,12 +94,16 @@ document.getElementById("rp-calc").addEventListener("click", async () => {
     const Grado = parseInt(document.getElementById("rp-grado").value || "2");
     const Tolerancia = parseFloat(document.getElementById("rp-tol").value || "0.8");
 
-    if (Puntos.length < Grado + 1) { alert(`Ingresá al menos ${Grado + 1} puntos.`); return; }
+    if (Puntos.length < Grado + 1) {
+        alert(`Ingresá al menos ${Grado + 1} puntos.`);
+        return;
+    }
 
     let res;
     try {
         res = await fetch(END_POLI, {
-            method: "POST", headers: { "Content-Type": "application/json" },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ Puntos, Grado, Tolerancia })
         });
     } catch (err) {
