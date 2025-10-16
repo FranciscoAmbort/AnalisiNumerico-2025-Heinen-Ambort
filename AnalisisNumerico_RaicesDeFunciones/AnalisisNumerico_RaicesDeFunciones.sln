@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppi", "WebAppi\WebAppi.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalisisNumerico_SistemasDeEcuaciones", "AnalisisNumerico_SistemasDeEcuaciones\AnalisisNumerico_SistemasDeEcuaciones.csproj", "{C8F19D8B-F62C-42B6-8202-8A9053C2A3AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalisisNumerico_AjusteDeCurva", "AnalisisNumerico_AjusteDeCurva\AnalisisNumerico_AjusteDeCurva.csproj", "{648DAD4B-D367-48E9-8738-C4F1D72E9173}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalisisNumerico_AjusteDeCurva", "AnalisisNumerico_AjusteDeCurva\AnalisisNumerico_AjusteDeCurva.csproj", "{648DAD4B-D367-48E9-8738-C4F1D72E9173}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalisisNumerico_IntegracionNuemrica", "AnalisisNumerico_IntegracionNuemrica\AnalisisNumerico_IntegracionNuemrica.csproj", "{5110ADDE-AD04-4CA0-A58A-4836567B00E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{648DAD4B-D367-48E9-8738-C4F1D72E9173}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{648DAD4B-D367-48E9-8738-C4F1D72E9173}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{648DAD4B-D367-48E9-8738-C4F1D72E9173}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5110ADDE-AD04-4CA0-A58A-4836567B00E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5110ADDE-AD04-4CA0-A58A-4836567B00E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5110ADDE-AD04-4CA0-A58A-4836567B00E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5110ADDE-AD04-4CA0-A58A-4836567B00E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

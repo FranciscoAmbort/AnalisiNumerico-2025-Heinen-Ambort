@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AnalisisNumerico_AjusteDeCurva\AnalisisNumerico_AjusteDeCurva.csproj" />
+    <ProjectReference Include="..\AnalisisNumerico_IntegracionNuemrica\AnalisisNumerico_IntegracionNuemrica.csproj" />
     <ProjectReference Include="..\AnalisisNumerico_RaicesDeFunciones\AnalisisNumerico_RaicesDeFunciones.csproj" />
     <ProjectReference Include="..\AnalisisNumerico_SistemasDeEcuaciones\AnalisisNumerico_SistemasDeEcuaciones.csproj" />
   </ItemGroup>
