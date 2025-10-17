@@ -1,21 +1,85 @@
-﻿// wwwroot/Integracion/simpson38.js
-async function calcular() {
-    const requestData = {
-        funcion: document.getElementById('funcion').value,
-        xi: parseFloat(document.getElementById('xi').value),
-        xd: parseFloat(document.getElementById('xd').value)
-    };
-    const resultadoInput = document.getElementById('area');
+﻿// ✅ 1. Inicializar GeoGebra
+let ggbApp = null;
+window.addEventListener("load", function () {
+    ggbApp = new GGBApplet({
+        appName: "graphing",
+        width: 800,
+        height: 560,
+        showToolBar: false,
+        showAlgebraInput: false,
+        showMenuBar: false,
+        appletOnLoad: function (api) {
+            console.log("GeoGebra listo para Integración");
+        }
+    }, true);
+    ggbApp.inject('ggb-element');
+});
+
+// ✅ 2. Función auxiliar para convertir la expresión
+function convertirFuncionParaGeoGebra(fx) {
+    let s = String(fx).replace(/\^/g, '^');
+    s = s.replace(/\be\s*\^\s*\(([^)]+)\)/gi, 'exp($1)');
+    s = s.replace(/\be\s*\^\s*([a-zA-Z0-9\.\-]+)/gi, 'exp($1)');
+    return s
+        .replace(/Abs/gi, "abs")
+        .replace(/Log10/gi, "log10")
+        .replace(/Log/gi, "log")
+        .replace(/Ln/gi, "ln")
+        .replace(/Sen/gi, "sin");
+}
+
+// ✅ 3. Función para dibujar la integral
+function graficarIntegral(fx, xi, xd) {
+    if (!ggbApp || !ggbApp.getAppletObject) {
+        return;
+    }
+    const ggb = ggbApp.getAppletObject();
+    ggb.reset();
 
     try {
-        const response = await fetch('/api/integracion/simpson38', { // <-- URL actualizada
+        const f = convertirFuncionParaGeoGebra(fx);
+        ggb.evalCommand(`f(x) = ${f}`);
+        ggb.evalCommand(`integral = Integral(f, ${xi}, ${xd})`);
+
+        ggb.setColor("f", 0, 120, 0);
+        ggb.setLineThickness("f", 5);
+        ggb.setColor("integral", 34, 197, 94);
+        ggb.setFilling("integral", 0.4);
+
+        ggb.evalCommand(`ZoomIn(${xi - 1}, ${-2}, ${xd + 1}, ${10})`);
+    } catch (err) {
+        console.error("Error al graficar en GeoGebra:", err);
+    }
+}
+
+// ✅ 4. Función 'calcular' actualizada para Simpson 3/8
+async function calcular() {
+    const funcion = document.getElementById('funcion').value;
+    const xi = parseFloat(document.getElementById('xi').value);
+    const xd = parseFloat(document.getElementById('xd').value);
+    const resultadoDiv = document.getElementById('area-resultado');
+
+    const requestData = { funcion, xi, xd };
+
+    try {
+        // La URL del endpoint ahora es '/api/integracion/simpson38'
+        const response = await fetch('/api/integracion/simpson38', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData)
         });
+
         const result = await response.json();
-        resultadoInput.value = response.ok ? result.area : `Error: ${result.error}`;
+
+        if (response.ok) {
+            resultadoDiv.textContent = result.area.toFixed(6);
+            // Llamamos a la función para graficar
+            graficarIntegral(funcion, xi, xd);
+        } else {
+            resultadoDiv.textContent = `Error: ${result.error}`;
+        }
     } catch (error) {
-        resultadoInput.value = 'No se pudo conectar con el servidor.';
+        resultadoDiv.textContent = 'Error de conexión.';
+        console.error('Error en la llamada fetch:', error);
     }
 }
