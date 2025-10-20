@@ -17,14 +17,18 @@ window.addEventListener("load", function () {
 
 // ✅ 2. Función auxiliar para convertir la expresión
 function convertirFuncionParaGeoGebra(fx) {
-    let s = String(fx).replace(/\^/g, '^');
-    s = s.replace(/\be\s*\^\s*\(([^)]+)\)/gi, 'exp($1)');
-    s = s.replace(/\be\s*\^\s*([a-zA-Z0-9\.\-]+)/gi, 'exp($1)');
+    let s = String(fx);
+
+    // Convierte e^x a exp(x) para GeoGebra
+    s = s.replace(/\be\s*\^\s*\(\s*([^()]+)\s*\)/gi, 'exp($1)');
+    s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, 'exp($1)');
+
     return s
         .replace(/Abs/gi, "abs")
         .replace(/Log10/gi, "log10")
-        .replace(/Log/gi, "log")
+        .replace(/Log/gi, "ln")
         .replace(/Ln/gi, "ln")
+        .replace(/Exp/gi, "exp")
         .replace(/Sen/gi, "sin");
 }
 
