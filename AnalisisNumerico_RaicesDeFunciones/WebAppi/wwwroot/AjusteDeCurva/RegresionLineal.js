@@ -1,10 +1,15 @@
 ﻿// ================== ENDPOINT ==================
 const END_LINEAL = "/api/RegresionLineal";
+// === NUEVO ENDPOINT PARA RECALCULAR ===
+const END_RECALCULAR = "/api/RegresionLineal/recalcular";
 
 // ================== GeoGebra ==================
 let ggbLin = null;
 let ggbLinReadyResolve;
 const ggbLinReady = new Promise(res => (ggbLinReadyResolve = res));
+
+// === VARIABLE GLOBAL PARA PUNTOS ===
+let puntosCargados = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     const params = {
@@ -79,12 +84,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // debe contener "y=" y luego algo con "x"
         const idxEq = s.indexOf("y=");
-        const idxX = s.indexOf("x", idxEq + 2);
-        if (idxEq === -1 || idxX === -1) return null;
+        // Buscamos 'x' o '*x'
+        let idxX = s.indexOf("x", idxEq + 2);
+        let idxMulX = s.indexOf("*x", idxEq + 2);
+
+        if (idxMulX !== -1 && (idxX === -1 || idxMulX < idxX)) {
+            idxX = idxMulX;
+        }
+
+        if (idxEq === -1 || idxX === -1) {
+            // Intento con formato "y = a1x+a0" (sin espacio antes de x)
+            // Esta regex es más simple que la del C# pero captura los dos números
+            const match = s.match(/y=([+-]?\d*\.?\d*)x([+-]\d+\.?\d*)/);
+            if (match && match[1] && match[2]) {
+                const a1 = Number(match[1]);
+                const a0 = Number(match[2]);
+                if (Number.isFinite(a1) && Number.isFinite(a0)) return [a0, a1];
+            }
+            console.warn("No se pudo parsear la función (formato no reconocido):", funcion);
+            return null; // No se pudo parsear
+        }
+
 
         // tramo pendiente (entre '=' y 'x')
         let a1str = s.slice(idxEq + 2, idxX);
         if (a1str.endsWith("*")) a1str = a1str.slice(0, -1);
+        if (a1str === "" || a1str === "+") a1str = "1"; // para "y=x"
+        if (a1str === "-") a1str = "-1"; // para "y=-x"
 
         // tramo independiente (después de 'x'); si vacío, 0
         let a0str = s.slice(idxX + 1);
@@ -110,6 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // --- INICIO MODIFICACIÓN: Guardar puntos ---
+        // Guardamos una copia de los puntos para usarlos en el recálculo
+        puntosCargados = [...Puntos];
+        // --- FIN MODIFICACIÓN ---
+
         let res;
         try {
             res = await fetch(END_LINEAL, {
@@ -134,12 +165,30 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Lineal -> respuesta", data);
 
         // Mostrar resultados
-        document.getElementById("funcion").textContent =
-            data.Funcion ?? data.funcion ?? "—";
+        const funcionOriginal = data.Funcion ?? data.funcion ?? "—";
+        document.getElementById("funcion").textContent = funcionOriginal;
+
         document.getElementById("correlacion").textContent =
-            (Number(data.Correlacion ?? data.correlacion ?? 0).toFixed(2)) + " %";
+            (Number(data.Correlacion ?? data.correlacion ?? data.r2 ?? 0).toFixed(2)) + " %"; // Acepta 'r2' también
+
         document.getElementById("efectividad").textContent =
             data.EfectividadAjuste ?? data.efectividadAjuste ?? "—";
+
+
+        // --- INICIO MODIFICACIÓN: Mostrar sección de recálculo ---
+        const seccionModificar = document.getElementById("modificarRectaSeccion");
+        const inputModificar = document.getElementById("rectaModificadaInput");
+        const resultadoModificar = document.getElementById("resultadoNuevoR2");
+
+        if (seccionModificar && inputModificar && resultadoModificar) {
+            inputModificar.value = funcionOriginal; // Pone la recta original en el input
+            resultadoModificar.innerHTML = ""; // Limpia resultado anterior
+            seccionModificar.style.display = "block"; // Muestra la sección
+        } else {
+            console.warn("Faltan IDs para la sección 'modificarRectaSeccion', 'rectaModificadaInput' o 'resultadoNuevoR2'");
+        }
+        // --- FIN MODIFICACIÓN ---
+
 
         // ---- Coeficientes: del backend o parseando la función ----
         let C = data.Coeficientes ?? data.coeficientes;
@@ -152,15 +201,94 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // GeoGebra
         await ggbClearLin();
-        await ggbAddPointsLin(Puntos);
+        await ggbAddPointsLin(Puntos); // Usa los puntos frescos leídos
         if (Array.isArray(C) && C.length === 2 && C.every(Number.isFinite)) {
             const [a0, a1] = C;
-            await ggbPlotLine(a0, a1);
+            await ggbPlotLine(a0, a1, 34, 197, 94); // Grafica la línea original en verde
         } else {
             console.warn("Coeficientes no válidos para la recta:", C);
         }
         await ggbFitLin(Puntos);
     });
+
+
+    // --- INICIO MODIFICACIÓN: NUEVO EVENT LISTENER PARA RECALCULAR ---
+    const btnRecalcular = document.getElementById("btnCalcularNuevoR2");
+    const inputRectaMod = document.getElementById("rectaModificadaInput");
+    const divResultadoNuevo = document.getElementById("resultadoNuevoR2");
+
+    if (btnRecalcular && inputRectaMod && divResultadoNuevo) {
+
+        btnRecalcular.addEventListener("click", async () => {
+
+            const funcionModificada = inputRectaMod.value;
+
+            if (puntosCargados.length === 0) {
+                divResultadoNuevo.innerHTML = `<p style="color: red;">Error: No hay puntos cargados. Realice un cálculo primero.</p>`;
+                return;
+            }
+            if (!funcionModificada) {
+                divResultadoNuevo.innerHTML = `<p style="color: red;">Error: Debe ingresar una función modificada.</p>`;
+                return;
+            }
+
+            divResultadoNuevo.innerHTML = "Calculando...";
+
+            const requestBody = {
+                PuntosCargados: puntosCargados, // Usa los puntos guardados
+                FuncionModificada: funcionModificada
+            };
+
+            let res;
+            try {
+                res = await fetch(END_RECALCULAR, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!res.ok) {
+                    const txt = await res.text();
+                    throw new Error(txt || `Error ${res.status}`);
+                }
+
+                const data = await res.json();
+                console.log("Recalcular -> respuesta", data);
+
+                // Mostrar nuevo resultado
+                divResultadoNuevo.innerHTML = `
+                    <h3 style="color: blue;">Nuevo Coeficiente (r²): ${data.nuevoR2.toFixed(4)}%</h3>
+                `;
+
+                // --- Actualizar GeoGebra con la nueva recta ---
+                const C_mod = parseCoeffsFromFuncion(funcionModificada);
+
+                await ggbClearLin();
+                await ggbAddPointsLin(puntosCargados); // Puntos originales
+
+                if (Array.isArray(C_mod) && C_mod.length === 2 && C_mod.every(Number.isFinite)) {
+                    const [a0_mod, a1_mod] = C_mod;
+                    // Grafica la nueva línea en azul
+                    await ggbPlotLine(a0_mod, a1_mod, 0, 0, 255);
+                } else {
+                    console.warn("Coeficientes modificados no válidos para la recta:", C_mod);
+                    divResultadoNuevo.innerHTML += `<p style="color: orange;">Advertencia: No se pudo graficar la recta modificada (formato inválido).</p>`;
+                }
+
+                await ggbFitLin(puntosCargados); // Re-ajustar zoom
+
+            } catch (err) {
+                console.error("Error al recalcular:", err);
+                // Muestra el error del backend (ej: formato inválido)
+                divResultadoNuevo.innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
+            }
+        });
+
+    } else {
+        console.error("Faltan IDs para el recálculo (btnCalcularNuevoR2, rectaModificadaInput, resultadoNuevoR2).");
+    }
+    // --- FIN MODIFICACIÓN ---
+
 });
 
 // ================== Funciones GeoGebra ==================
@@ -183,7 +311,8 @@ async function ggbAddPointsLin(pts) {
     }
 }
 
-async function ggbPlotLine(a0, a1) {
+// --- MODIFICADA para aceptar color ---
+async function ggbPlotLine(a0, a1, r = 34, g = 197, b = 94) {
     await ggbLinReady;
 
     const a0n = Number((a0 + "").replace(",", "."));
@@ -202,7 +331,7 @@ async function ggbPlotLine(a0, a1) {
             ggbLin.evalCommand(def);
         }
         ggbLin.setLineThickness(label, 5);
-        ggbLin.setColor(label, 34, 197, 94); // mismo verde que polinomial
+        ggbLin.setColor(label, r, g, b); // Color dinámico
         console.log("GeoGebra creó la recta:", label, "=>", def);
     } catch (e) {
         console.error("GeoGebra no pudo crear la recta con:", def, e);
