@@ -24,6 +24,7 @@ function convertirFuncionParaGeoGebra(fx) {
     s = s.replace(/\be\s*\^\s*([-+]?\s*[^+\-*/()\s]+)/gi, 'exp($1)');
 
     return s
+        .replace(/sqr/gi, "sqrt")
         .replace(/Abs/gi, "abs")
         .replace(/Log10/gi, "log10")
         .replace(/Log/gi, "ln")
